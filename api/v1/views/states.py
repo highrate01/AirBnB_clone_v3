@@ -8,7 +8,7 @@ from models import storage
 
 @app_views.route('/states', strict_slashes=False)
 def get_states():
-    """retrieve al states"""
+    """retrieves all states"""
     states = storage.all(State).values()
     list_state = [state.to_dict() for state in states]
     return jsonify(list_state)
@@ -51,7 +51,7 @@ def create_state():
         return abort(400, "Missing name")
     state = State(**kwargs)
     state.save()
-    return jsonify(state.to_dict()), 200
+    return jsonify(state.to_dict()), 201
 
 
 @app_views.route('/states/<state_id>', methods=['PUT'], strict_slashes=False)
