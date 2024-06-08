@@ -11,6 +11,7 @@ def api_status():
     response = {"status": "OK"}
     return jsonify(response)
 
+
 @app_views.route('/stats')
 def get_stats():
     """retrieves the number of each objects by type"""
@@ -24,6 +25,7 @@ def get_stats():
             "users": storage.count('User')
             }
     return jsonify(stats)
+
 
 @app_views.errorhandler(404)
 def not_found(error):

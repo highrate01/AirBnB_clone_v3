@@ -103,10 +103,10 @@ class DBStorage:
         if cls is None:
             all_objs = self.all()
             return len(all_objs)
-
-        elif cls in classes.values():
-            cls_objs = self.all(cls)
-            return len(cls_objs)
+        for clas, value in classes.items():
+            if cls == clas or cls == value:
+                cls_objs = self.all(cls)
+                return len(cls_objs)
 
         else:
             return 0

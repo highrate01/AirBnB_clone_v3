@@ -9,11 +9,13 @@ from flask import Flask
 
 app = Flask(__name__)
 app.register_blueprint(app_views)
-app.teardown.appcontext
 
-def teardown():
+
+@app.teardown_appcontext
+def teardown(exception):
     """close engine"""
     storage.close()
+
 
 if __name__ == "__main__":
     HOST = getenv("HBNB_API_HOST", '0.0.0.0')
