@@ -25,10 +25,3 @@ def get_stats():
             "users": storage.count('User')
             }
     return jsonify(stats)
-
-
-@app_views.errorhandler(404)
-def not_found(error):
-    """custom error handler"""
-    response = {"error": "Not found"}
-    return jsonfy(response), 404
