@@ -7,11 +7,10 @@ from api.v1.views import app_views
 from models import storage
 
 
-@app_views.route('/amenities', methods=['GET'],
-                 strict_slashes=False)
+@app_views.route('/amenities', methods=['GET'], strict_slashes=False)
 def get_amenities():
     """retrieve all amenity objects"""
-    amenities = storage.all(Amenity).values()
+    amenities = storage.all(Amenity).values()  # Corrected to use values()
     list_amenity = [amenity.to_dict() for amenity in amenities]
     return jsonify(list_amenity)
 
@@ -40,8 +39,7 @@ def delete_amenity(amenity_id):
         return abort(404)
 
 
-@app_views.route('/amenities', methods=['POST'],
-                 strict_slashes=False)
+@app_views.route('/amenities', methods=['POST'], strict_slashes=False)
 def create_amenity():
     """creates amenity objects"""
     if request.content_type != 'application/json':
