@@ -16,7 +16,7 @@ from models.state import State
 from models.user import User
 import json
 import os
-import pep8
+import pycodestyle
 import unittest
 DBStorage = db_storage.DBStorage
 classes = {"Amenity": Amenity, "City": City, "Place": Place,
@@ -32,14 +32,14 @@ class TestDBStorageDocs(unittest.TestCase):
 
     def test_pep8_conformance_db_storage(self):
         """Test that models/engine/db_storage.py conforms to PEP8."""
-        pep8s = pep8.StyleGuide(quiet=True)
+        pep8s = pycodestyle.StyleGuide(quiet=True)
         result = pep8s.check_files(['models/engine/db_storage.py'])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
 
     def test_pep8_conformance_test_db_storage(self):
         """Test tests/test_models/test_db_storage.py conforms to PEP8."""
-        pep8s = pep8.StyleGuide(quiet=True)
+        pep8s = pycodestyle.StyleGuide(quiet=True)
         result = pep8s.check_files(['tests/test_models/test_engine/\
 test_db_storage.py'])
         self.assertEqual(result.total_errors, 0,
@@ -78,11 +78,70 @@ class TestFileStorage(unittest.TestCase):
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_all_no_class(self):
         """Test that all returns all rows when no class is passed"""
+        state_data = {"name": "Lagos"}
+        new_state = State(**state_data)
+        models.storage.new(new_state)
+        models.storage.save()
+        session = models.storage._DBStorage__session
+        all_objs = session.query(State).all()
+        self.assertTrue(len(all_objs) > 0)
 
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_new(self):
         """test that new adds an object to the database"""
+        state_data = {"name": "Nairobi"}
+        new_state = State(**state_data)
+        models.storage.new(new_state)
+        models.storage.save()
+        session = models.storage._DBStorage__session
+        retrieve_state = (
+                session.query(State).filter_by(id=new_state.id).first()
+                )
+        self.assertEqual(retrieve_state.id, new_state.id)
+        self.assertEqual(retrieve_state.name, new_state.name)
+        self.assertIsNotNone(retrieve_state)
 
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
+        state_data = {"name": "Abuja"}
+        new_state = State(**state_data)
+        models.storage.new(new_state)
+        models.storage.save()
+        session = models.storage._DBStorage__session
+        retrieve_state = (
+                session.query(State).filter_by(id=new_state.id).first()
+                )
+        self.assertEqual(retrieve_state.id, new_state.id)
+        self.assertEqual(retrieve_state.name, new_state.name)
+        self.assertIsNotNone(retrieve_state)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get(self):
+        """test that get retrieve objects properly"""
+        storage = models.storage
+        storage.reload()
+        state_data = {"name": "Oyo"}
+        new_state = State(**state_data)
+        storage.new(new_state)
+        storage.save()
+        retrieve_state = storage.get(State, new_state.id)
+        self.assertEqual(new_state, retrieve_state)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count(self):
+        """test that count returns number of objs in the storage"""
+        storage = models.storage
+        storage.reload()
+        state_data = {"name": "London"}
+        new_state = State(**state_data)
+        storage.new(new_state)
+        storage.save()
+        city_data = {"name": "Ojo", "state_id": new_state.id}
+        new_city = City(**city_data)
+        storage.new(new_city)
+        storage.save()
+        state_obj = storage.count(State)
+        self.assertEqual(state_obj, len(storage.all(State)))
+        all_obj = storage.count()
+        self.assertEqual(all_obj, len(storage.all()))
